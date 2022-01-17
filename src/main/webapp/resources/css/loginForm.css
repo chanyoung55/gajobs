@@ -1,0 +1,83 @@
+@charset "UTF-8";
+
+/* -- 로그인 전체 박스 -- */
+.login-box {
+	position : absolute;
+	left: 50%;
+	top : 50%;
+	transform: translate(-50%,-50%);
+	width: 800px;
+	height: 400px;
+	margin: 0 auto;
+	border-radius: 12px;
+	box-shadow: 10px 10px 10px rgba(0,0,0,0.5);
+}
+
+/* -- 왼쪽 박스 -- */
+.left-box {
+	display: inline-block;
+	width: 49%;
+	height: 400px;
+	float: left;
+	border-radius: 12px;
+	background: rgb(243, 156, 18);
+	color: #fff;
+}
+.title-box {
+	text-align: center;
+}
+.image-box {
+	height: 300px;
+}
+.image-box img {
+	display: block;
+	margin: 0 auto;
+	width: 200px;
+	height: 250px;
+	padding-top: 50px;
+}
+
+/* -- 왼쪽 로그인 박스 -- */ 
+.right-box {
+	display: inline-block;
+	width: 49%;
+	height: 400px;
+	float: right;
+}
+.login-title {
+	margin-top: 50px;
+	text-align: center;
+}
+.login-title h2 {
+	margin: 0;
+}
+.input-box {
+	display: block;
+	text-align: center;
+	width: 200px;
+	height : auto;
+	margin: 0 auto;
+}
+.input-box input {
+	padding : 5px;
+	width : 180px;
+	height: 30px;
+	margin-top:10px;
+}
+.btn-box {
+	margin-top : 50px;
+	text-align: center;
+}
+.btn-box input {
+	background : rgb(52, 152, 219);
+	border:none;
+	border-radius: 5px;
+	color: #fff;
+	font-weight : 600;
+	width: 100px;
+	height: 40px;
+	cursor: pointer;
+}
+.btn-box input:hover {
+	background : rgb(41, 128, 185);
+}

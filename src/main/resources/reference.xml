@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="referencens">
+	<select id="referenceList" parameterType="reference" resultType="reference">
+		select * from(select rownum rn, a.* from(select r.*,k.rfk_name from reference r, referenceKind k
+		where r.rfk_seq = k.rfk_seq
+			<if test="kinds != 0 and kinds !=null and kinds != ''">
+				and r.rfk_seq = #{kinds}
+			</if>
+			<if test="keyword != null and keyword !=''">
+				<if test="search == 'sall'">
+					and
+					(r.rf_title like '%'||#{keyword}||'%'
+						or
+					r.rf_writer like '%'||#{keyword}||'%'
+					    or
+					r.rf_content like '%'||#{keyword}||'%')
+				</if>
+				<if test="search !='sall'">
+					and	${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+		order by rf_num desc)a) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getTotal" parameterType="reference" resultType="integer">
+		select count(*) from reference r, referenceKind k where r.rfk_seq = k.rfk_seq
+			<if test="kinds != 0 and kinds !=null and kinds != ''">
+					and r.rfk_seq = #{kinds}
+			</if>
+			<if test="keyword != null and keyword !=''">
+				<if test="search == 'sall'">
+					and
+					(r.rf_title like '%'||#{keyword}||'%'
+						or
+					r.rf_writer like '%'||#{keyword}||'%'
+					    or
+					r.rf_content like '%'||#{keyword}||'%')
+				</if>
+				<if test="search !='sall'">
+					and ${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+			
+	</select>
+	<select id="fileList" parameterType="referencefile" resultType="referencefile">
+		select * from referenceFile
+	</select>
+	<select id="kindList" parameterType="referencekind" resultType="referencekind">
+		select * from referenceKind
+	</select>
+	<select id="getMaxNum" resultType="integer">
+		select NVL(Max(rf_num),0) from reference 
+	</select>
+	<insert id="insert" parameterType="reference">
+		insert into reference values(#{rf_num},#{rf_writer},sysdate,#{rf_content},#{rf_count},#{rf_title},#{rfk_seq},#{m_id})
+	</insert>
+	<insert id="insertFile" parameterType="referencefile">
+		insert into referenceFile values(referenceFile_seq.nextVal,#{rff_name},#{rff_origin},#{rff_size},#{rff_type},sysdate,#{rff_url},#{rf_num})
+	</insert>
+	<select id="selectFilebyseq" parameterType="integer" resultType="referencefile">
+		select * from referenceFile where rff_seq = #{rff_seq}
+	</select>
+	<select id="select" parameterType="integer" resultType="reference">
+		select r.*,k.rfk_name,m.r_code from reference r, referenceKind k, member m where r.rf_num = #{rf_num} 
+		and r.rfk_seq = k.rfk_seq and m.m_id = r.m_id
+	</select>
+	<select id="selectFilebyNum" parameterType="integer" resultType="referencefile">
+		select * from referenceFile where rf_num = #{rf_num}
+	</select>
+	<select id="fileByNumCount" parameterType="integer" resultType="integer">
+		select count(*) from referenceFile where rf_num = #{rf_num}
+	</select>
+	<delete id="fileDelByNum" parameterType="integer">
+		delete from referenceFile where rf_num = #{rf_num}
+	</delete>
+	<delete id="referenceDel" parameterType="integer">
+		delete from reference where rf_num = #{rf_num}
+	</delete>
+	<delete id="deleteBySeq" parameterType="integer">
+		delete from referenceFile where rff_seq = #{rff_seq}
+	</delete>
+	<update id="update" parameterType="reference">
+		update reference set rf_title = #{rf_title} , rf_content = #{rf_content} , rfk_seq = #{rfk_seq} where rf_num = #{rf_num}
+	</update>
+	<select id="refCount" parameterType="reference" resultType="integer">
+		select count(*) from reference where rf_date between #{startDate} and #{endDate}
+	</select>
+	<select id="referenceListByDate" parameterType="reference" resultType="reference">
+		select * from reference where rf_date between #{startDate} and #{endDate}
+	</select>
+</mapper>

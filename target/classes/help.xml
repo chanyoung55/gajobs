@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="helpns">
+	<select id="getMaxNum" resultType="integer">
+		select count(h_num) from help
+	</select>
+	<insert id="sendHelp" parameterType="help">
+		insert into help values(#{h_num},#{h_title},#{h_email},#{h_content},sysdate,#{m_id},#{h_writer},'n')
+	</insert>
+	<insert id="sendFile" parameterType="helpfile">
+		insert into helpFile values(helpfile_seq.nextVal,#{hf_name},#{hf_origin},#{hf_size},#{hf_type},sysdate,#{hf_url},#{h_num})
+	</insert>
+	<select id="readHelp" parameterType="help" resultType="help">
+		select * from (select rownum rn, a.* from (select h.*,m.r_code,m.b_seq,m.t_seq from help h, member m where h.m_id = m.m_id
+		<if test="keyword != null and keyword !=''">
+			<if test="search == 'alls'">
+				and (
+					h_writer like '%'||#{keyword}||'%'
+						or
+					h_title like '%'||#{keyword}||'%'
+						or
+					h_content like '%'||#{keyword}||'%')
+			</if>
+			<if test="search != 'alls'">
+				and ${search} like '%'||#{keyword}||'%'
+			</if>
+		</if>
+		order by h_date desc)a) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getTotal" parameterType="help" resultType="integer">
+		select count(*) from help
+			<where>
+				<if test="keyword != null and keyword !=''">
+					<if test="search == 'alls'">
+						h_writer like '%'||#{keyword}||'%'
+							or
+						h_title like '%'||#{keyword}||'%'
+							or
+						h_content like '%'||#{keyword}||'%'
+					</if>
+					<if test="search != 'alls'">
+					 ${search} like '%'||#{keyword}||'%'
+					</if>
+				</if>
+			</where>
+	</select>
+	<select id="readHelpByNum" parameterType="integer" resultType="help">
+		select 
+			h.*, m.b_seq, m.t_seq, m.b_seq, m.r_code,m.m_tel, m.m_email, r.r_name, t.t_name, b.b_name 
+		from 
+			help h, member m, team t, branch b, role r 
+		where 
+			m.m_id = h.m_id 
+		and
+			m.b_seq = b.b_seq
+		and
+			m.t_seq = t.t_seq
+		and
+			m.r_code = r.r_code
+		and 
+			h.h_num = #{h_num}
+	</select>
+	<select id="fileListByNum" parameterType="integer" resultType="helpfile">
+		select * from helpFile where h_num = #{h_num}
+	</select>
+	<update id="read" parameterType="integer">
+		update help set
+		h_read = 'y'
+		where h_num = #{h_num}
+	</update>
+	<update id="notRead" parameterType="integer">
+		update help set
+		h_read = 'n'
+		where h_num = #{h_num}
+	</update>
+	<select id="selectfileByseq" parameterType="integer" resultType="helpfile">
+		select * from helpFile where hf_seq = #{hf_seq}
+	</select>
+	<select id="fileCountByNum" parameterType="integer" resultType="integer">
+		select count(*) from helpFile where h_num = #{h_num}
+	</select>
+	<delete id="deleteFileByNum" parameterType="integer">
+		delete from helpFile where h_num = #{h_num}
+	</delete>
+	<delete id="deleteHelpNum" parameterType="integer">
+		delete from help where h_num = #{h_num}
+	</delete>
+	<select id="getEmailMaxNum" resultType="integer">
+		select count(em_num) from email
+	</select>
+	<insert id="insertEmail" parameterType="email">
+		insert into email values(#{em_num},#{em_title},#{em_content},#{em_recipient},#{em_smail},#{em_rmail},sysdate,#{m_id},'n')
+	</insert>
+	<select id="emailList" parameterType="email" resultType="email">
+		select * from (select rownum rn, a.* from(select * from email where em_del = 'n'
+			<if test="keyword != null and keyword !=''">
+				<if test="search=='alls'">
+				and
+					(em_title like '%'||#{keyword}||'%'
+						or
+					em_rmail like '%'||#{keyword}||'%'
+						or
+					m_id like '%'||#{keyword}||'%'
+						or
+					em_content like '%'||#{keyword}||'%'
+						or
+					em_recipient like '%'||#{keyword}||'%')
+				</if>
+				<if test="search!='alls'">
+					and	${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+		order by em_date desc)a) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getEmailTotal" parameterType="email" resultType="integer">
+		select count(*) from email where em_del = 'n'
+			<if test="keyword != null and keyword !=''">
+				<if test="search=='alls'">
+					and 
+					(em_title like '%'||#{keyword}||'%'
+						or
+					em_rmail like '%'||#{keyword}||'%'
+						or
+					m_id like '%'||#{keyword}||'%'
+						or
+					em_content like '%'||#{keyword}||'%'
+						or
+					em_recipient like '%'||#{keyword}||'%')
+				</if>
+				<if test="search!='alls'">
+					and	${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+	</select>
+	<select id="selectEmailByNum" parameterType="integer" resultType="email">
+		select * from email where em_num = #{em_num}
+	</select>
+	<select id="comList" parameterType="company" resultType="company">
+		select * from (select rownum rn ,a.* from (select * from company 
+		<where>
+			<if test="keyword != null and keyword !=''">
+				<if test="search=='alls'">
+					cp_name like '%'||#{keyword}||'%'
+						or
+					cp_kinds like '%'||#{keyword}||'%'
+						or
+					cp_del like '%'||#{keyword}||'%'
+				</if>
+				<if test="search!='alls'">
+					${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+		</where>
+		order by cp_del)a) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getComTotal" parameterType="company" resultType="integer">
+		select count(*) from company
+		<where>
+			<if test="keyword != null and keyword !=''">
+				<if test="search=='alls'">
+					cp_name like '%'||#{keyword}||'%'
+						or
+					cp_kinds like '%'||#{keyword}||'%'
+						or
+					cp_del like '%'||#{keyword}||'%'
+				</if>
+				<if test="search!='alls'">
+					${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+		</where>
+	</select>
+	<select id="selectComBySeq" parameterType="integer" resultType="company">
+		select * from company where cp_seq = #{cp_seq}
+	</select>
+	<update id="updateCom" parameterType="company">
+		update company set cp_name = #{cp_name}, cp_kinds = #{cp_kinds} where cp_seq = #{cp_seq}
+	</update>
+	<update id="deleteCom" parameterType="integer">
+		update company set cp_del = 'y' where cp_seq = #{cp_seq}
+	</update>
+	<update id="activeCom" parameterType="integer">
+		update company set cp_del = 'n' where cp_seq = #{cp_seq}
+	</update>
+	<update id="emailDelete" parameterType="integer">
+		update email set
+			em_del = 'y'
+			where em_num = #{em_num}
+	</update>
+ </mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="noticens">
+	<!-- 공지사항글 리스트 페이징,검색 -->
+	<select id="noticeList" resultType="notice">
+		select * from (select rownum rn, a.* from(select * from notice
+		<where>
+			<if test="keyword != null and keyword !=''">
+				<if test="search=='sall'">
+					n_title like '%'||#{keyword}||'%'
+						or
+					n_writer like '%'||#{keyword}||'%'
+						or
+					n_content like '%'||#{keyword}||'%'	
+				</if>
+				<if test="search!='sall'">
+					${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>		
+		</where> 
+		order by n_num desc)a) where rn between #{startRow} and #{endRow}
+	</select>
+	
+	<select id="getTotal" parameterType="notice" resultType="integer">
+		select count(*) from notice
+		<where>
+			<if test="keyword != null and keyword !=''">
+				<if test="search=='sall'">
+					n_title like '%'||#{keyword}||'%'
+						or
+					n_writer like '%'||#{keyword}||'%'
+						or
+					n_content like '%'||#{keyword}||'%'	
+				</if>
+				<if test="search!='sall'">
+					${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+		</where>
+	</select>
+	<select id="getMaxNum" resultType="integer">
+		select NVL(Max(n_num),0) from notice
+	</select>
+	<insert id="insert" parameterType="notice">
+		insert into notice values(#{n_num},#{n_title},#{n_content},sysdate,0,#{n_writer},#{m_id})
+	</insert>
+	<insert id="insertFile" parameterType="noticefile">
+		insert into NoticeFile values(NoticeFile_seq.nextVal,#{nf_name},#{nf_origin},#{nf_size},#{nf_type},sysdate,#{nf_url},#{n_num})
+	</insert>
+	<select id="select" parameterType="integer" resultType="notice">
+		select * from notice where n_num = #{n_num}
+	</select>
+	<select id="selectFile" parameterType="integer" resultType="noticefile">
+		select * from NoticeFile where n_num = #{n_num}
+	</select>
+	<select id="selectFilebyseq" parameterType="integer" resultType="noticefile">
+		select * from NoticeFile where nf_seq = #{nf_seq}
+	</select>
+	<update id="updateCount" parameterType="integer">
+		update notice set n_count = n_count + 1 where n_num = #{n_num}
+	</update>
+	<select id="countByNum" parameterType="integer" resultType="integer">
+		select NVL(count(*),0) from NoticeFile where n_num = #{n_num}
+	</select>
+	<delete id="delete" parameterType="integer">
+		delete from notice where n_num = #{n_num}
+	</delete>
+	<delete id="deleteFile" parameterType="integer">
+		delete from NoticeFile where n_num = #{n_num}
+	</delete>
+	<delete id="deleteBySeq" parameterType="integer">
+		delete from NoticeFile where nf_seq = #{nf_seq}
+	</delete>
+	<update id="update" parameterType="notice">
+		update notice set n_title = #{n_title} , n_content = #{n_content} where n_num = #{n_num}
+	</update>
+	<insert id="insertRe" parameterType="noticere">
+		insert into NoticeRe values(NoticeRe_seq.nextVal,#{nr_content},sysdate,#{n_num},#{m_id},#{nr_writer})
+	</insert>
+	<select id="selectRe" parameterType="integer" resultType="noticere">
+		select * from NoticeRe where n_num = #{n_num}
+	</select>
+	<delete id="deleteRe" parameterType="integer">
+		delete from NoticeRe where nr_seq = #{nr_seq}
+	</delete>
+	<select id="reCountByNum" parameterType="integer" resultType="integer">
+		select NVL(count(*),0) from NoticeRe where n_num = #{n_num}
+	</select>
+	<delete id="reDeleteByNum" parameterType="integer">
+		delete from noticeRe where n_num = #{n_num}
+	</delete>
+	<select id="noticeCount" parameterType="notice" resultType="integer">
+		select count(*) from notice where n_date between #{startDate} and #{endDate} 
+	</select>
+	<select id="noticeListByDate" parameterType="notice" resultType="notice">
+		select * from notice where n_date between #{startDate} and #{endDate}
+	</select>
+</mapper>

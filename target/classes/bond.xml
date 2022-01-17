@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="bondns">
+	<select id="bondList" parameterType="bond" resultType="bond">
+		select * from 
+			(select rownum rn, a.* from(
+			select 
+			m.m_name,
+			m.m_email,
+			m.m_tel,
+			m.m_del,
+			m.m_deldate,
+			m.b_seq,
+			m.t_seq,
+			m.r_code,
+			b.b_name,
+			t.t_name,
+			r.r_name, 
+			k.*
+				from
+			member m ,branch b, team t, role r , bond k 
+					where
+				m.b_seq = b.b_seq 
+                    and 
+                m.r_code = r.r_code
+                    and 
+                m.t_seq = t.t_seq
+                	and
+                m.m_id = k.m_id
+                <if test="startDate != null and startDate !=''">
+                	and bo_enddate between #{startDate} and #{endDate}
+                </if>
+				<if test="keyword != null and keyword !=''">
+					<if test="search=='alls'">
+						and	
+					(k.m_id like '%'||#{keyword}||'%'
+						or
+					m_name like '%'||#{keyword}||'%'
+						or
+					bo_kinds like '%'||#{keyword}||'%'
+						or
+					r_name like '%'||#{keyword}||'%')
+					</if>
+					<if test="search!='alls'">
+					and ${search} like '%'||#{keyword}||'%' 
+					</if>
+				</if>
+		order by k.bo_enddate)a) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getTotal" parameterType="bond" resultType="integer">
+		select NVL(count(*),0) from 
+		member m ,branch b, team t, role r , bond k
+			where
+		m.b_seq = b.b_seq 
+            and 
+        m.r_code = r.r_code
+            and 
+        m.t_seq = t.t_seq
+            and
+        m.m_id = k.m_id
+        <if test="startDate != null and startDate !=''">
+            and bo_enddate between #{startDate} and #{endDate}
+        </if>
+        <if test="keyword != null and keyword !=''">
+			<if test="search=='alls'">
+				and	
+			(k.m_id like '%'||#{keyword}||'%'
+				or
+			m_name like '%'||#{keyword}||'%'
+				or
+			bo_kinds like '%'||#{keyword}||'%'
+				or
+			r_name like '%'||#{keyword}||'%')
+			</if>
+			<if test="search!='alls'">
+			and ${search} like '%'||#{keyword}||'%' 
+			</if>
+		</if>
+	</select>
+	<select id="getMaxNumByBond" resultType="integer">
+		select NVL(Max(bo_num),0) from bond
+	</select>
+	<insert id="insertBond" parameterType="bond">
+		insert into bond values(#{bo_num},#{bo_kinds},#{bo_startdate},#{bo_enddate},#{bo_pay},#{m_id})
+	</insert>
+	<insert id="insertBondFile" parameterType="bondfile">
+		insert into bondFile values(BondFile_seq.nextVal,#{bof_name},#{bof_origin},#{bof_size},#{bof_type},sysdate,#{bof_url},#{bo_num})
+	</insert>
+	<select id="selectBond" parameterType="integer" resultType="bond">
+		select * from bond where bo_num = #{bo_num}
+	</select>
+	<select id="fileSelectByNum" parameterType="integer" resultType="bondfile">
+		select * from bondFile where bo_num = #{bo_num}
+	</select>
+	<delete id="deleteBondFile" parameterType="integer">
+		delete from bondFile where bo_num = #{bo_num}
+	</delete>
+	<delete id="deleteBond" parameterType="integer">
+		delete from bond where bo_num = #{bo_num}
+	</delete>
+	<select id="fileCount" parameterType="integer" resultType="integer">
+		select count(*) from bondFile where bo_num = #{bo_num}
+	</select>
+	<select id="selectFileByseq" parameterType="integer" resultType="bondfile">
+		select * from bondFile where bof_seq = #{bof_seq}
+	</select>
+	<update id="updateBond" parameterType="bond">
+		update bond set 
+			bo_kinds = #{bo_kinds},
+			bo_startdate = #{bo_startdate},
+			bo_enddate = #{bo_enddate},
+			bo_pay = #{bo_pay}
+			where bo_num = #{bo_num}
+	</update>
+	<update id="updateBondFile" parameterType="bondFile">
+		update bondFile set 
+			bof_origin = #{bof_origin},
+			bof_name = #{bof_name},
+			bof_type = #{bof_type},
+			bof_size = #{bof_size},
+			bof_url = #{bof_url}
+			where bof_seq = #{bof_seq}
+	</update>
+</mapper>

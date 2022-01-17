@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="memberns">
+	<update id="setUp" parameterType="member">
+		update member set m_password = #{m_password} where m_id = #{m_id}
+	</update>
+	<select id="select" parameterType="string" resultType="member">
+		select 
+			m.*, b.b_name, t.t_name , r.r_name 
+		from 
+			member m, branch b, team t, role r 
+		where 
+			m.b_seq = b.b_seq 
+		and 
+			m.r_code = r.r_code
+		and 
+			m.t_seq = t.t_seq
+		and 
+			m.m_id = #{m_id}
+	</select>
+	<update id="updateUser" parameterType="member">
+		update 
+			member 
+		set 
+			<if test="m_password != null and m_password !='' ">
+			m_password = #{m_password},
+			</if>
+			m_tel = #{m_tel}, 
+			m_email = #{m_email}, 
+			m_addr = #{m_addr},
+			m_postcode = #{m_postcode},
+			m_detailaddr = #{m_detailaddr},
+			m_extraaddr = #{m_extraaddr}
+		where
+			m_id = #{m_id}
+	</update>
+	<select id="memberList" parameterType="member" resultType="member">
+		select * from 
+			(select rownum rn, a.* from(select m.*,b.b_name,t.t_name,r.r_name from
+			member m ,branch b, team t, role r 
+					where
+				m.b_seq = b.b_seq 
+                    and 
+                m.r_code = r.r_code
+                    and 
+                m.t_seq = t.t_seq
+            	<if test="startDate != null and startDate !=''">
+            	and m_hiredate between #{startDate} and #{endDate}
+            	</if>
+				<if test="keyword != null and keyword !=''">
+					and ${search} like '%'||#{keyword}||'%' 
+				</if>
+		order by m_del,m_hiredate desc)a) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getTotal" parameterType="member" resultType="integer">
+		select count(*) from 
+		member m, branch b, team t, role r 
+				where
+			m.b_seq = b.b_seq 
+	            and 
+	        m.r_code = r.r_code
+	            and 
+	        m.t_seq = t.t_seq
+	       <if test="startDate != null and startDate !=''">
+            	and m_hiredate between #{startDate} and #{endDate}
+            </if>
+		<if test="keyword != null and keyword !=''">
+		and ${search} like '%'||#{keyword}||'%' 
+		</if>
+	</select>
+	<select id="mgrlist" resultType="member">
+		select m_id,m_name from member
+	</select>
+	<select id="branchList" resultType="branch">
+		select * from branch
+	</select>
+	
+	<select id="roleList" resultType="role">
+		select * from role
+	</select>
+	
+	<select id="teamList" parameterType="integer" resultType="team">
+		select * from team where b_seq = #{b_seq}
+	</select>
+	
+	<select id="mgrSearch" parameterType="member" resultType="member">
+		select m.*,b.b_name,t.t_name,r.r_name from
+		member m ,branch b, team t, role r 
+					where
+				m.m_del = 'n'
+					and 
+				m.b_seq = b.b_seq 
+                    and 
+                m.r_code = r.r_code
+                    and 
+                m.t_seq = t.t_seq
+                    and
+		${search} like '%'||#{keyword}||'%'
+	</select>
+	<update id="setupPass" parameterType="member">
+		update member set m_password = #{m_password} where m_id = #{m_id}
+	</update>
+	<insert id="insert" parameterType="member">
+		insert into member values(#{m_id},#{m_password},#{m_name},#{m_ssnum},#{m_email},#{m_tel},#{m_hiredate},#{m_addr},#{m_postcode},#{m_detailaddr},#{m_extraaddr},'n','',#{m_mgr},#{b_seq},#{r_code},#{t_seq})
+	</insert>
+	<insert id="insertFile" parameterType="appointfile">
+		insert into appointFile values(appointfile_seq.nextVal,#{m_id},#{af_name},#{af_origin},#{af_size},#{af_type},sysdate,#{af_url})
+	</insert>
+	<select id="branchJoinList" parameterType="branch" resultType="branch">
+		select * from 
+			(select rownum rn, a.* from
+			(select b.* , 
+				(select count(*) from team t where t.b_seq = b.b_seq) teamCount,
+				(select count(*) from member m where m.b_seq = b.b_seq and m.m_del='n') personCount
+					from branch b
+				<where>
+					<if test="keyword != null and keyword !=''">
+						b.b_name like '%'||#{keyword}||'%'
+					</if>
+				</where>
+			order by b.b_seq desc)a) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getBranchTotal" parameterType="branch" resultType="integer">
+		select count(*) from (select b.* ,
+		(select count(*) from team t where t.b_seq = b.b_seq) teamCount , 
+		(select count(*) from member m where m.b_seq = b.b_seq and m.m_del='n') personCount
+					from branch b
+			<where>
+				<if test="keyword != null and keyword !=''">
+					b.b_name like '%'||#{keyword}||'%'
+				</if>
+			</where>
+			)
+	</select>
+	<select id="fileList" parameterType="string" resultType="appointfile">
+		select * from appointFile where m_id = #{m_id} order by af_date desc
+	</select>
+	<select id="fileCount" parameterType="string" resultType="integer">
+		select count(*) from appointFile where m_id = #{m_id}
+	</select>
+	<select id="selectFileByseq" parameterType="integer" resultType="appointfile">
+		select * from appointFile where af_seq = #{af_seq}
+	</select>
+	<update id="delete" parameterType="string">
+		update member set m_del = 'y', m_deldate = sysdate where m_id = #{m_id}
+	</update>
+	<delete id="deleteFile" parameterType="string">
+		delete from appointFile where m_id = #{m_id}
+	</delete>
+	<select id="branchSelectName" parameterType="string" resultType="branch">
+		select * from branch where b_name = #{b_name}
+	</select>
+	<insert id="insertBranch" parameterType="branch">
+		insert into branch values(branch_seq.NextVal,#{b_name},sysdate)
+	</insert>
+	<delete id="deleteBySeq" parameterType="integer">
+		delete from appointFile where af_seq = #{af_seq}
+	</delete>
+	<update id="reSetPass" parameterType="member">
+		update member set m_password = #{m_password} where m_id = #{m_id}
+	</update>
+	<update id="updateWithPass" parameterType="member">
+		update member set 
+		m_password = #{m_password}, 
+		m_name = #{m_name}, 
+		m_ssnum = #{m_ssnum}, 
+		m_email = #{m_email}, 
+		m_tel = #{m_tel}, 
+		m_hiredate = #{m_hiredate}, 
+		m_addr = #{m_addr},
+		m_postcode = #{m_postcode}, 
+		m_detailaddr = #{m_detailaddr}, 
+		m_extraaddr = #{m_extraaddr}, 
+		m_mgr = #{m_mgr}, 
+		r_code = #{r_code}, 
+		b_seq = #{b_seq}, 
+		t_seq = #{t_seq}
+		where m_id = #{m_id}
+	</update>
+	<update id="update" parameterType="member">
+		update member set 
+		m_name = #{m_name}, m_ssnum = #{m_ssnum}, 
+		m_email = #{m_email}, m_tel = #{m_tel}, 
+		m_hiredate = #{m_hiredate}, 
+		m_postcode = #{m_postcode}, 
+		m_addr = #{m_addr},
+		m_detailaddr = #{m_detailaddr}, 
+		m_extraaddr = #{m_extraaddr}, 
+		m_mgr = #{m_mgr}, 
+		r_code = #{r_code}, 
+		b_seq = #{b_seq}, 
+		t_seq = #{t_seq}
+		where m_id = #{m_id}
+	</update>
+	<select id="branchSelectSeq" parameterType="integer" resultType="branch">
+		select * from branch where b_seq = #{b_seq}
+	</select>
+	<select id="mCountByBranch" parameterType="integer" resultType="integer">
+		select count(*) from member where b_seq = #{b_seq} and m_del = 'n'
+	</select>
+	<select id="tCountByBranch" parameterType="integer" resultType="integer">
+		select count(*) from team where b_seq = #{b_seq}
+	</select>
+	<select id="leaveCount" parameterType="integer" resultType="integer">
+		select count(*) from member where b_seq = #{b_seq} and m_del = 'y'
+	</select>
+	<update id="branchUpdate" parameterType="branch">
+		update branch set b_name = #{b_name} where b_seq = #{b_seq} 
+	</update>
+	<delete id="teamDelbyBranch" parameterType="integer">
+		delete from team where b_seq = #{b_seq}
+	</delete>
+	<delete id="branchDel" parameterType="integer">
+		delete from branch where b_seq = #{b_seq}
+	</delete>
+	<select id="teamChk" parameterType="team" resultType="team">
+		select * from team where b_seq = #{b_seq} and t_name = #{t_name}
+	</select>
+	<insert id="insertTeam" parameterType="team">
+		insert into team values(team_seq.nextVal,#{t_name},sysdate,#{b_seq})
+	</insert>
+	<select id="memberListByTseq" parameterType="member" resultType="member">
+		select * from 
+		(select rownum rn, a.* from
+			(select m.*,r.r_name from member m, role r where m.t_seq = #{t_seq} and m.r_code = r.r_code
+			 order by m_del,m_hiredate)a) 
+		where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getTotalByTseq" parameterType="member" resultType="integer">
+	select count(*) from member where t_seq = #{t_seq}
+	</select>
+	<select id="teamSelectByseq" parameterType="integer" resultType="team">
+		select * from team where t_seq = #{t_seq}
+	</select>
+	<select id="mCountByTeam" parameterType="integer" resultType="integer">
+		select count(*) from member where t_seq = #{t_seq} and m_del = 'n'
+	</select>
+	<select id="leaveCountByTseq" parameterType="integer" resultType="integer">
+		select count(*) from member where t_seq = #{t_seq} and m_del = 'y'
+	</select>
+	<delete id="deleteTeam" parameterType="integer">
+		delete from team where t_seq = #{t_seq}
+	</delete>
+	<update id="updateTeam" parameterType="team">
+		update team set t_name = #{t_name} where t_seq = #{t_seq} 
+	</update>
+	<update id="reEntred" parameterType="string">
+		update member set m_del = 'n' , m_deldate = '' where m_id = #{m_id}
+	</update>
+		<select id="bondMemberList" parameterType="member" resultType="member">
+		select m.*,b_name,t_name from member m ,branch b,team t 
+		where m.t_seq = t.t_seq
+		and m.b_seq = b.b_seq
+		<if test="search=='alls'">
+				and
+			(m_id like '%'||#{keyword}||'%'
+				or
+			m_name like '%'||#{keyword}||'%'
+				or 
+			b_name like '%'||#{keyword}||'%'
+				or
+			t_name like '%'||#{keyword}||'%')
+		</if>
+		<if test="search!='alls'">
+			and	${search} like '%'||#{keyword}||'%'
+		</if>
+	</select>
+	<select id="selectByBond" parameterType="string" resultType="member">
+		select m.*,r.r_name,t.t_name,b.b_name from member m, role r, team t, branch b
+		where m_id = #{m_id}
+	</select>
+</mapper>

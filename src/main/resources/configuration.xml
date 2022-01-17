@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<!-- 회원 모델  -->
+		<typeAlias alias="member" type="com.pj.gajobs.model.Member"/>
+		<typeAlias alias="branch" type="com.pj.gajobs.model.Branch"/>
+		<typeAlias alias="role" type="com.pj.gajobs.model.Role"/>
+		<typeAlias alias="team" type="com.pj.gajobs.model.Team"/>
+		<typeAlias alias="appointfile" type="com.pj.gajobs.model.AppointFile"/>
+
+		<!-- 공지사항 모델  -->
+		<typeAlias alias="notice" type="com.pj.gajobs.model.Notice"/>
+		<typeAlias alias="noticefile" type="com.pj.gajobs.model.NoticeFile"/>
+		<typeAlias alias="noticere" type="com.pj.gajobs.model.NoticeRe"/>
+		
+		<!-- 서식자료실 모델 -->
+		<typeAlias alias="reference" type="com.pj.gajobs.model.Reference"/>
+		<typeAlias alias="referencefile" type="com.pj.gajobs.model.ReferenceFile"/>
+		<typeAlias alias="referencekind" type="com.pj.gajobs.model.ReferenceKind"/>
+		
+		<!-- 고객관리 모델 -->
+		<typeAlias alias="consumer" type="com.pj.gajobs.model.Consumer"/>
+		<typeAlias alias="consumerfile" type="com.pj.gajobs.model.ConsumerFile"/>
+		<typeAlias alias="consumercon" type="com.pj.gajobs.model.ConsumerCon"/>
+		
+		<!-- 채권관리 모델 -->
+		<typeAlias alias="bond" type="com.pj.gajobs.model.Bond"/>
+		<typeAlias alias="bondfile" type="com.pj.gajobs.model.BondFile"/>
+	
+		<!-- 교육게시판 모델 -->
+		<typeAlias alias="education" type="com.pj.gajobs.model.Education"/>
+		<typeAlias alias="educationfile" type="com.pj.gajobs.model.EducationFile"/>
+		<typeAlias alias="educationre" type="com.pj.gajobs.model.EducationRe"/>
+		
+		<!-- 회사명 모델 -->
+		<typeAlias alias="company" type="com.pj.gajobs.model.Company"/>
+		
+		<!-- 문의사항 모델 -->
+		<typeAlias alias="help" type="com.pj.gajobs.model.Help"/>
+		<typeAlias alias="helpfile" type="com.pj.gajobs.model.HelpFile"/>
+			
+		<!-- 이메일 모델 -->
+		<typeAlias alias="email" type="com.pj.gajobs.model.Email"/>
+		
+	</typeAliases>
+	<mappers>
+		<mapper resource="member.xml"/>
+		<mapper resource="notice.xml"/>
+		<mapper resource="reference.xml"/>
+		<mapper resource="consumer.xml"/>
+		<mapper resource="education.xml"/>
+		<mapper resource="bond.xml"/>
+		<mapper resource="help.xml"/>
+	</mappers>
+</configuration>

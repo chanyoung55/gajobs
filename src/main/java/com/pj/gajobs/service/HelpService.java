@@ -1,0 +1,62 @@
+package com.pj.gajobs.service;
+
+import java.util.List;
+
+import com.pj.gajobs.model.Company;
+import com.pj.gajobs.model.Email;
+import com.pj.gajobs.model.Help;
+import com.pj.gajobs.model.HelpFile;
+
+public interface HelpService {
+
+	int getMaxNum();
+
+	int sendHelp(Help help);
+
+	void sendFile(List<HelpFile> helpFileList);
+
+	List<Help> readHelp(Help help);
+
+	int getTotal(Help help);
+
+	Help readHelpByNum(int h_num);
+
+	List<HelpFile> fileListByNum(int h_num);
+
+	int read(int h_num);
+
+	int notRead(int h_num);
+
+	HelpFile selectfileByseq(int hf_seq);
+
+	int fileCountByNum(int h_num);
+
+	int deleteFileByNum(int h_num);
+
+	int deleteHelpByNum(int h_num);
+
+	int getEmailMaxNum();
+	
+	int insertEmail(Email email);
+
+	List<Email> emailList(Email email);
+
+	int getEmailTotal(Email email);
+
+	Email selectEmailByNum(int em_num);
+
+	List<Company> comList(Company company);
+
+	int getComTotal(Company company);
+
+	Company selectComBySeq(int cp_seq);
+
+	int updateCom(Company company);
+
+	int deleteCom(int cp_seq);
+
+	int activeCom(int cp_seq);
+
+	int emailDelete(int em_num);
+
+}

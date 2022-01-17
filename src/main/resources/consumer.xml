@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="consumerns">
+	<select id="consumerList" parameterType="consumer" resultType="consumer">
+		select * from (select rownum rn, a.* from(select * from consumer
+			where m_id = #{m_id}
+			<if test="keyword != null and keyword != ''">
+				<if test="search =='alls'">
+					and
+					(c_name like '%'||#{keyword}||'%'
+						or
+					c_relation like '%'||#{keyword}||'%'
+						or
+					c_smemo; like '%'||#{keyword}||'%')
+				</if>
+				<if test="search !='alls'">
+				 and ${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+		order by c_date)a) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getTotal" parameterType="consumer" resultType="integer">
+	select count(*) from consumer where m_id = #{m_id}
+	<if test="keyword != null and keyword != ''">
+				<if test="search =='alls'">
+					and
+					(c_name like '%'||#{keyword}||'%'
+						or
+					c_relation like '%'||#{keyword}||'%'
+						or
+					c_smemo; like '%'||#{keyword}||'%')
+				</if>
+				<if test="search !='alls'">
+				 and ${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+	</select>
+	<select id="getMaxNum" resultType="integer">
+		select NVL(Max(c_num),0) from consumer
+	</select>
+	<insert id="insertConsumer" parameterType="consumer">
+		insert into consumer values(#{c_num},#{c_name},#{c_relation},#{c_ssnum},#{c_agree},#{c_family},#{c_tel},#{c_postcode},#{c_addr},#{c_detailaddr},#{c_extraaddr},#{c_history},#{c_smemo},#{c_lmemo},#{m_id},sysdate,#{c_sex})
+	</insert>
+	<insert id="insertFile" parameterType="consumerfile">
+		insert into consumerFile values(consumerfile_seq.nextVal,#{cf_name},#{cf_origin},#{cf_size},#{cf_type},sysdate,#{cf_url},#{c_num})
+	</insert>
+	<select id="selectConsumer" resultType="consumer" parameterType="integer">
+		select * from consumer where c_num = #{c_num}
+	</select>
+	<select id="fileCount" resultType="integer" parameterType="integer">
+		select count(*) from consumerFile where c_num = #{c_num}
+	</select>
+	<select id="conList" parameterType="consumercon" resultType="consumercon">
+		select * from 
+		(select rownum rn, a.* from
+		(select c.*, p.cp_name from consumerCon c,company p where c.cp_seq = p.cp_seq and c_num = #{c_num} order by cc_condate)a) where rn between #{startRow} and #{endRow}
+	</select>
+	<select id="getTotalCon" parameterType="consumercon" resultType="integer">
+		select count(*) from consumerCon where c_num = #{c_num} 
+	</select>
+	<select id="comList" parameterType="company" resultType="company">
+		select * from company where cp_del = 'n' order by cp_setdate
+	</select>
+	<insert id="insertContract" parameterType="consumercon">
+		insert into consumerCon values(consumercon_seq.nextVal,#{cp_seq},#{cc_kinds},#{cc_condate},#{cc_startdate},#{cc_enddate},#{cc_pay},#{cc_insurance},#{cc_subinsurance},#{cc_state},#{c_num},#{cc_connum})
+	</insert>
+	<select id="selectContract" parameterType="integer" resultType="integer">
+		select c_num from consumerCon where cc_seq = #{cc_seq}
+	</select>
+	<delete id="contractDel" parameterType="integer">
+		delete from consumerCon where cc_seq = #{cc_seq}
+	</delete>
+	<select id="selectContractAll" parameterType="integer" resultType="consumercon">
+		select * from consumerCon where cc_seq = #{cc_seq}
+	</select>
+	<update id="updateContract" parameterType="consumercon">
+		update consumerCon set 
+			cp_seq = #{cp_seq}, 
+			cc_kinds = #{cc_kinds}, 
+			cc_connum = #{cc_connum}, 
+			cc_condate = #{cc_condate}, 
+			cc_startdate = #{cc_startdate}, 
+			cc_enddate = #{cc_enddate}, 
+			cc_pay = #{cc_pay},
+			cc_insurance = #{cc_insurance},
+			cc_subinsurance = #{cc_subinsurance},
+			cc_state = #{cc_state}
+		where 
+			cc_seq = #{cc_seq}  
+	</update>
+	<select id="contractCountByNum" parameterType="integer" resultType="integer">
+		select count(*) from consumerCon where c_num = #{c_num}
+	</select>
+	<delete id="contractDelByNum" parameterType="integer">
+		delete from consumerCon where c_num = #{c_num}
+	</delete>
+	<delete id="consumerDelete" parameterType="integer">
+		delete from consumer where c_num = #{c_num}
+	</delete>
+	<select id="fileCountByNum" parameterType="integer" resultType="integer">
+		select count(*) from consumerFile where c_num = #{c_num}
+	</select>
+	<delete id="filedelete" parameterType="integer">
+		delete from consumerFile where c_num = #{c_num}
+	</delete>
+	<select id="fileSelectByNum" parameterType="integer" resultType="consumerfile">
+		select * from consumerFile where c_num = #{c_num} 
+	</select>
+	<select id="selectFileByseq" parameterType="integer" resultType="consumerfile">
+		select * from consumerFile where cf_seq = #{cf_seq}
+	</select>
+	<delete id="deleteFilebySeq" parameterType="integer">
+		delete from consumerFile where cf_seq = #{cf_seq}
+	</delete>
+	<update id="updateConsumer" parameterType="consumer">
+		update consumer set
+			 c_name = #{c_name},
+			 c_relation = #{c_relation},
+			 c_ssnum = #{c_ssnum},
+			 c_sex = #{c_sex},
+			 c_family = #{c_family},
+			 c_tel = #{c_tel},
+			 c_history = #{c_history},
+			 c_postcode = #{c_postcode},
+			 c_addr = #{c_addr},
+			 c_detailaddr = #{c_detailaddr},
+			 c_extraaddr = #{c_extraaddr},
+			 c_smemo = #{c_smemo},
+			 c_lmemo = #{c_lmemo}
+		 where 
+		 	 c_num = #{c_num}
+	</update>
+	<select id="conCount" parameterType="consumer" resultType="integer">
+		select count(*) from consumer where c_date between #{startDate} and #{endDate}
+	</select>
+	<select id="consumerListByDate" parameterType="consumer" resultType="consumer">
+		select * from consumer where c_date between #{startDate} and #{endDate}
+	</select>
+</mapper>

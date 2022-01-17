@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="educationns">
+	<!-- 공지사항글 리스트 페이징,검색 -->
+	<select id="eduList" resultType="education">
+		select * from (select rownum rn, a.* from(select * from education
+		<where>
+			<if test="keyword != null and keyword !=''">
+				<if test="search=='sall'">
+					e_title like '%'||#{keyword}||'%'
+						or
+					e_writer like '%'||#{keyword}||'%'
+						or
+					e_content like '%'||#{keyword}||'%'	
+				</if>
+				<if test="search!='sall'">
+					${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>		
+		</where> 
+		order by e_num desc)a) where rn between #{startRow} and #{endRow}
+	</select>
+	
+	<select id="getTotal" parameterType="education" resultType="integer">
+		select count(*) from education
+		<where>
+			<if test="keyword != null and keyword !=''">
+				<if test="search=='sall'">
+					e_title like '%'||#{keyword}||'%'
+						or
+					e_writer like '%'||#{keyword}||'%'
+						or
+					e_content like '%'||#{keyword}||'%'	
+				</if>
+				<if test="search!='sall'">
+					${search} like '%'||#{keyword}||'%'
+				</if>
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insert" parameterType="education">
+		insert into education values(#{e_num},#{e_title},#{e_content},sysdate,0,#{e_writer},#{m_id})
+	</insert>
+	<select id="getMaxNum" resultType="integer">
+		select NVL(Max(e_num),0) from education
+	</select>
+	<insert id="insertFile" parameterType="educationfile">
+		insert into EducationFile values(EducationFile_seq.nextVal,#{ef_name},#{ef_origin},#{ef_size},#{ef_type},sysdate,#{ef_url},#{e_num})
+	</insert>
+	<update id="updateCount" parameterType="integer">
+		update education set e_count = e_count+1 where e_num = #{e_num} 
+	</update>
+	<select id="select" parameterType="integer" resultType="education">
+		select * from education where e_num = #{e_num}
+	</select>
+	<select id="selectFile" parameterType="integer" resultType="educationfile">
+		select * from educationFile where e_num = #{e_num}
+	</select>
+	<select id="selectRe" parameterType="integer" resultType="educationre">
+		select * from educationRe where e_num = #{e_num}
+	</select>
+	<select id="selectFilebyseq" parameterType="integer" resultType="educationfile">
+		select * from educationFile where ef_seq = #{ef_seq}
+	</select>
+	<select id="countByNum" parameterType="integer" resultType="integer">
+		select NVL(count(*),0) from educationFile where e_num = #{e_num}
+	</select>
+	<select id="reCountByNum" parameterType="integer" resultType="integer">
+		select NVL(count(*),0) from educationRe where e_num = #{e_num}
+	</select>
+	<delete id="deleteFile" parameterType="integer">
+		delete from educationFile where e_num = #{e_num}
+	</delete>
+	<delete id="reDeleteByNum" parameterType="integer">
+		delete from educationRe where e_num = #{e_num}
+	</delete>
+	<delete id="delete" parameterType="integer">
+		delete from education where e_num = #{e_num}
+	</delete>
+	<delete id="deleteBySeq" parameterType="integer">
+		delete from educationFile where ef_seq = #{ef_seq}
+	</delete>
+	<insert id="insertRe" parameterType="educationre">
+		insert into educationRe values(EducationRe_seq.NextVal,#{er_content},sysdate,#{er_writer},#{e_num},#{m_id})
+	</insert>
+	<delete id="deleteRe" parameterType="integer">
+		delete from educationRe where er_seq = #{er_seq}
+	</delete>
+	<update id="update" parameterType="education">
+		update education set e_title = #{e_title}, e_content = #{e_content} where e_num = #{e_num}
+	</update>
+	<select id="eduCount" parameterType="education" resultType="integer">
+		select count(*) from education where e_date between #{startDate} and #{endDate}
+	</select>
+	<select id="eduListByDate" parameterType="education" resultType="education">
+		select * from education where e_date between #{startDate} and #{endDate}
+	</select>
+</mapper>

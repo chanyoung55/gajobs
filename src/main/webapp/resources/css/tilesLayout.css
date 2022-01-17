@@ -1,0 +1,175 @@
+@charset "UTF-8";
+
+/* common */
+.mt-1 {
+	margin-top: 10px;
+}
+.mt-2 {
+	margin-top: 20px;
+}
+.mt-3 {
+	margin-top: 30px;
+}
+.mt-4 {
+	margin-top: 40px;
+}
+.mt-5 {
+	margin-top: 50px;
+}
+
+/* sideNav */
+#sideNav {
+	position: fixed;
+	width: 200px;
+	height: 100%;
+	text-align: center;
+	background: rgb(52, 152, 219);
+	color : #fff;
+	overflow: scroll;
+	-ms-overflow-style: none;
+	scrollbar-width: none;
+	transition: 0.5s;
+}
+#sideNav::-webkit-scrollbar {
+	display: none;
+}
+
+.title-box a {
+	color:#fff;
+	text-decoration: none;
+}
+.title-box a:hover {
+	text-decoration: none;
+	color:#fff;
+}
+.profile-box {
+	text-align : center;
+	margin-top: 40px;
+}
+.user-face-box {
+	display : block;
+	width : 100px;
+	height : 100px;
+	margin : 0 auto;
+	background-color: #fff;
+	border-radius: 50%;
+	text-align: center;
+}
+
+.user-icon {
+	line-height: 100px;
+	font-size: 4.5rem;
+	color: #e0e0e0;
+}
+.user-info-box {
+	margin-top: 20px;
+	color: #000;
+}
+
+.user-name {
+	width: 100%;
+	font-size: 2rem;
+}
+.user-role {
+	font-size : 1.7rem;
+	font-weight: bold;
+}
+.user-branch {
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+.side-menu {
+	margin-top: 80px;
+	padding: 0;
+	list-style: none;
+	font-size: 2rem;
+	margin-bottom: 40px;
+}
+.side-menu li {
+	height : 30px;
+	margin-bottom: 10px;
+}
+.side-menu li a{
+	height : 30px;
+	display: block;
+	color:#fff;
+	text-decoration: none;
+	line-height: 35px;
+}
+.side-menu li a:hover{
+	background: #fff;
+	color : rgb(52, 152, 219);
+}
+.admin-menu {
+	margin-top: 50px;
+}
+
+/* headerNav */
+#headerNav {
+	background : #fff;
+	display:block;
+	height: 60px;
+	width: 100vw-202px;
+	overflow: hidden;
+	padding-left: 200px;
+	transition: 0.5s;
+}
+.btn-box{
+	display : inline-block;
+	line-height : 60px;
+	height: 60px;
+	margin-left: 10px;
+}
+.btn-box span{
+	font-size: 3rem;
+	color:#000;
+	line-height : 60px;
+}
+.hambuger {
+	cursor: pointer;
+	transition: 0.3s;
+}
+.header-menu {
+	display :block;
+	list-style: none;
+	float: right;
+	line-height: 60px;
+	margin: 0;
+	padding: 0;
+	margin-right: 20px;
+}
+.header-menu li {
+	height: 60px;
+	float: left;
+	margin-left: 10px;
+	margin-right: 10px;
+	line-height: 60px;
+	font-size : 1.8rem;
+}
+.header-menu li a {
+	text-align: center;
+	font-size: 1.8rem;
+	display: inline-block;
+	width:100px;
+	height: 20px;
+	padding : 0;
+	text-decoration: none;
+	color:#000;
+}
+.header-menu li a:hover {
+	color: rgb(52, 152, 219);
+	font-weight: bold;
+}
+.header-menu li span {
+	height: 20px;
+	line-height: 20px;
+}
+.header-menu li i{
+	font-size: 1.8rem;
+	height: 20px;
+	line-height: 20px;
+}
+/* content */
+#content {
+	padding-left: 200px;
+}
